@@ -1,0 +1,12 @@
+# OS / editor
+.DS_Store
+.vscode/
+*.code-workspace
+
+# Python / Jupyter
+__pycache__/
+.ipynb_checkpoints/
+
+# Generated locally (re-create by running the notebooks / scripts)
+all_cases_figures/
+logs/
