@@ -1,18 +1,38 @@
-# Graph Signal Recovery: Method 6 (two stages: flag outliers, then refill)
+# Graph Signal Recovery (group project)
 
-Group project for Mathematics Foundation. The assignment itself is described in
-`Student_Graph_Signal_Assignment_MSSV_MODULO.ipynb` and `README_for_Students.md`.
+Group project for Mathematics Foundation: 7 methods to recover a graph signal, one per member.
+The assignment itself is described in `Student_Graph_Signal_Assignment_MSSV_MODULO.ipynb` and `README_for_Students.md`.
 
-## Files
+## Repository layout
+
+```
+public_cases.json                     the 100 public graphs (no ground truth), shared by everyone
+Student_Graph_Signal_Assignment_...   assignment notebook and README_for_Students.md (keep at the root,
+                                      the assignment notebook reads public_cases.json from its own folder)
+src/method_<#>/                       code and notebooks of method <#>
+figures/method_<#>/                   figures of method <#>
+results/method_<#>/                   xhat_<#>.npy of method <#>
+```
+
+Each member works only in their own `method_<#>` folders, so pushes do not conflict.
+Notebooks find `public_cases.json` by searching upward from their folder, so they run from any subfolder:
+
+```python
+from pathlib import Path
+ROOT = next(p for p in [Path.cwd(), *Path.cwd().parents] if (p / "public_cases.json").exists())
+FIG_DIR = ROOT / "figures" / "method_<#>"
+RES_DIR = ROOT / "results" / "method_<#>"
+```
+
+### Method 6 (two stages: flag outliers, then refill)
 
 | file | what it is |
 |---|---|
-| `method_6.ipynb` | Method 6, full version: vocabulary, worked examples, explanations, appendices |
-| `method_6_short.ipynb` | Method 6, short version: same code and results, only assumptions, formulas and results |
-| `method6_outliers.py` | Method 6 as a module for the other methods (`flag_outliers`, `refill_outliers`, `solve_two_stage`) |
-| `xhat_6.npy` | Final `x_hat` of method 6 on the real data |
-| `fig_y_vs_xhat_method6.png`, `fig_cv_k_method6.png` | Figures for the report |
-| `public_cases.json` | The 100 public graphs (no ground truth) |
+| `src/method_6/method_6.ipynb` | full version: vocabulary, worked examples, explanations, appendices |
+| `src/method_6/method_6_short.ipynb` | short version: same code and results, only assumptions, formulas and results |
+| `src/method_6/method6_outliers.py` | the method as a module (`flag_outliers`, `refill_outliers`, `solve_two_stage`) |
+| `results/method_6/xhat_6.npy` | final `x_hat` on the real data |
+| `figures/method_6/fig_y_vs_xhat_method6.png`, `fig_cv_k_method6.png` | figures for the report |
 
 Not tracked by git (see `.gitignore`): `all_cases_figures/`, `logs/`, `.vscode/`, `*.code-workspace`.
 
@@ -30,6 +50,8 @@ In VS Code, pick the kernel "Python (graph_signal_recovery)" for the notebooks.
 ## Using method 6 in another method
 
 ```python
+import sys
+sys.path.append(str(ROOT / "src" / "method_6"))      # ROOT as in "Repository layout"
 from method6_outliers import flag_outliers, refill_outliers, solve_two_stage
 
 flagged = flag_outliers(G, y)              # bool array, True = suspected outlier
@@ -70,7 +92,7 @@ Without this step, `git add` on a notebook fails with an error about the `nbstri
 ```bash
 git status                        # what changed
 git diff                          # line-by-line changes (notebooks shown without outputs)
-git add method_6.ipynb            # stage a file
+git add src/method_6/method_6.ipynb   # stage a file
 git commit -m "feat(method6): add prune pass to stage 1"
 git log --oneline                 # history
 ```
@@ -89,4 +111,4 @@ Suggested habits:
 - Work on a branch for bigger changes: `git switch -c feature/method6-tikhonov`, then open a pull request.
 - Commit messages follow Conventional Commits: `<type>(<scope>): <description>`,
   e.g. `fix(method6): handle nodes with no observed neighbour`, `docs(readme): add setup steps`.
-- Edit only your own `method_<#>.ipynb` to avoid conflicts; shared code goes in a `.py` file.
+- Edit only your own `src/method_<#>/`, `figures/method_<#>/` and `results/method_<#>/` to avoid conflicts; code others reuse goes in a `.py` file.
