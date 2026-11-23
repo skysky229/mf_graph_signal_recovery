@@ -1,0 +1,16 @@
+{
+  "method": "5. Graph Total Variation (ADMM)",
+  "representative_mssv": "20260001",
+  "best_params": {
+    "loss": "l2",
+    "lam": 0.1
+  },
+  "synthetic_rmse_mean": 0.238532139750309,
+  "synthetic_rmse_std": 0.03682137439457796,
+  "baseline_raw_y_rmse_mean": 0.2928018531676575,
+  "cv_score_real": 0.30705829663089546,
+  "cv_score_real_mean5": 0.37115451561809676,
+  "admm_iterations_real": 118,
+  "synthetic_rmse_blind_mean": 0.2641264492327902,
+  "synthetic_rmse_blind_std": 0.0465601773678099
+}
