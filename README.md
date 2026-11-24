@@ -24,6 +24,33 @@ FIG_DIR = ROOT / "figures" / "method_<#>"
 RES_DIR = ROOT / "results" / "method_<#>"
 ```
 
+### Method 4 (LAD / L1 data fit + Laplacian regularization)
+
+Model: `min_x Σ_observed |x_i − y_i| + λ xᵀLx`. The L1 fit bounds the pull of each outlier and keeps
+`x_hat_i = y_i` exactly at many nodes (sparse residual); for `λ ≤ λ0 = 1 / (2‖Ly‖∞)` the solution is `y` itself.
+
+| file | what it is |
+|---|---|
+| `src/method_4/method_4.ipynb` | everything for method 4 (Vietnamese): data, solvers, correctness checks (CVXPY vs IRLS, KKT, `λ0`), IRLS convergence, 20 synthetic seeds, λ by `cv_score`, tests on all 100 public graphs, CSV export, result row, write-up (Mục VI) |
+| `src/method_4/method4_lad.py` | the solvers as a module (`solve_lad`, `solve_lad_irls`, `solve_tikhonov`, `lambda0`, `kkt_violation`), same code as the notebook |
+| `results/method_4/xhat_4.npy` | final `x_hat` on the real data |
+| `results/method_4/method_4.csv` | `x_hat` in the 4-column submission format of Mục VIII |
+| `figures/method_4/fig4_convergence.png`, `fig4_lambda_curve.png`, `fig4_graph_y_vs_xhat.png` | figures for the report |
+
+Result row (placeholder MSSV `20260001`, re-run once the real list is fixed):
+
+| method | parameters | synthetic RMSE, λ chosen by CV on each seed (seeds 0-19) | `cv_score` (real data, fold seed 0) |
+|---|---|---|---|
+| 4. LAD + Laplacian | `lam = 0.2234` (= 3.16·λ0) | 0.2596 ± 0.0576 | 0.3002 |
+
+Needs `cvxpy` (solver Clarabel, installed with cvxpy). The notebook runs in about 2 minutes.
+
+```python
+sys.path.append(str(ROOT / "src" / "method_4"))
+from method4_lad import solve_lad, lambda0
+x_hat = solve_lad(G, y, lam=0.2234)
+```
+
 ### Method 6 (two stages: flag outliers, then refill)
 
 | file | what it is |
@@ -41,7 +68,7 @@ Not tracked by git (see `.gitignore`): `all_cases_figures/`, `logs/`, `.vscode/`
 ```bash
 conda create -n graph_signal_recovery python=3.11
 conda activate graph_signal_recovery
-pip install numpy scipy networkx matplotlib jupyter ipykernel nbstripout
+pip install numpy scipy networkx matplotlib cvxpy jupyter ipykernel nbstripout
 python -m ipykernel install --user --name graph_signal_recovery --display-name "Python (graph_signal_recovery)"
 ```
 
