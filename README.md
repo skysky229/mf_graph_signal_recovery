@@ -34,6 +34,38 @@ RES_DIR = ROOT / "results" / "method_<#>"
 | `results/method_6/xhat_6.npy` | final `x_hat` on the real data |
 | `figures/method_6/fig_y_vs_xhat_method6.png`, `fig_cv_k_method6.png` | figures for the report |
 
+### Method 5 (Graph Total Variation, solved with ADMM)
+
+Model: `min_x Σ_observed loss(x_i − y_i) + λ Σ_(i,j) w_ij |x_i − x_j|` with `loss` squared or Huber.
+The TV term keeps sharp jumps between regions and makes the recovered signal constant on regions.
+
+| file | what it is |
+|---|---|
+| `src/method_5/method_5.ipynb` | everything for method 5, laid out like method 6: vocabulary; 1. data; 2. the method (ADMM solver, checks); 3. final `x_hat`; 4. result row; 5. write-up (Mục VI); appendices A-D (parameter grid, synthetic data, combination with method 6's flags, meeting notes) |
+| `src/method_5/method5_tv.py` | the solver as a module (`solve_tv`), same code as the notebook |
+| `results/method_5/xhat_5.npy` | final `x_hat` on the real data |
+| `results/method_5/result_5.json` | result row (parameters, synthetic RMSE, `cv_score`) |
+| `figures/method_5/fig5_convergence.png`, `fig5_lambda_selection.png`, `fig5_graph_y_vs_xhat.png` | figures for the report |
+
+Result row (placeholder MSSV `20260001`, re-run once the real list is fixed):
+
+| method | parameters | synthetic RMSE (seeds 0-19) | `cv_score` (real data) |
+|---|---|---|---|
+| 5. Graph TV (ADMM) | squared loss, `lam = 0.1` | 0.2385 ± 0.0368 | 0.3071 (mean of 5 splits, as method 6 reports: 0.3712) |
+
+`solve_tv(G, y, mask=None, lam=0.1, loss="l2", delta=0.2, rho=1.0, adaptive=True)` follows the group signature;
+`rho` only changes the speed (adaptive by default), not the result. The notebook runs in about 90 s.
+
+```python
+sys.path.append(str(ROOT / "src" / "method_5"))
+from method5_tv import solve_tv
+x_hat = solve_tv(G, y, lam=0.1)
+```
+
+Method 6's flags were tested with TV (notebook, Appendix C) and are **not** used: passing them as a mask
+makes both synthetic RMSE and real `cv_score` worse, and refilling them first lowers synthetic RMSE but worsens
+the real `cv_score` on most of the 100 public graphs.
+
 Not tracked by git (see `.gitignore`): `all_cases_figures/`, `logs/`, `.vscode/`, `*.code-workspace`.
 
 ## Setup
